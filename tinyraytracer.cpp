@@ -96,17 +96,20 @@ Vec3f cast_ray(const Vec3f &orig, const Vec3f &dir, const std::vector<Sphere> &s
     Vec3f point, N;
     Material material;
 
+    /* if (depth>4 || !scene_intersect(orig, dir, spheres, point, N, material)) {
+        return Vec3f(0.2, 0.7, 0.8); // background color
+    }*/
     if (depth>4 || !scene_intersect(orig, dir, spheres, point, N, material)) {
         Sphere fond(Vec3f(0,0,0), 100, Material());
         float dist;
         fond.ray_intersect(orig, dir, dist);
         Vec3f p = orig + dir*dist;
-        float theta = acos(p.y/100);
-        float phi = atan2(p.z, p.x);
-        int i = ((phi/2*M_PI)+ 0.5)*envmap_width;
-        int j = (theta/M_PI)*envmap_height;
-        return envmap[j+i*envmap_width];
-    }
+        float phi = acos(p.y/100);
+        float theta = atan2(p.z, p.x);
+        int i = ((theta/(2*M_PI))+ 0.5)*envmap_width;
+        int j = (phi/M_PI)*envmap_height;
+        return envmap[i+j*envmap_width];
+	}
 
     Vec3f reflect_dir = reflect(dir, N).normalize();
     Vec3f refract_dir = refract(dir, N, material.refractive_index).normalize();
@@ -157,7 +160,6 @@ void render(const std::vector<Sphere> &spheres, const std::vector<Light> &lights
             pixmap[i*3+j] = (unsigned char)(255 * std::max(0.f, std::min(1.f, framebuffer[i][j])));
         }
     }
-
     stbi_write_jpg("out.jpg", width, height, 3, pixmap.data(), 100);
 }
 
