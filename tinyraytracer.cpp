@@ -105,9 +105,8 @@ Vec3f cast_ray(const Vec3f &orig, const Vec3f &dir, const std::vector<Sphere> &s
         float phi = atan2(p.z, p.x);
         int i = ((phi/2*M_PI)+ 0.5)*envmap_width;
         int j = (theta/M_PI)*envmap_height;
-        return envmap[i+j*envmap_width];
+        return envmap[j+i*envmap_width];
     }
-
 
     Vec3f reflect_dir = reflect(dir, N).normalize();
     Vec3f refract_dir = refract(dir, N, material.refractive_index).normalize();
@@ -159,7 +158,7 @@ void render(const std::vector<Sphere> &spheres, const std::vector<Light> &lights
         }
     }
 
-    stbi_write_jpg("image.jpg", width, height, 3, pixmap.data(), 100);
+    stbi_write_jpg("out.jpg", width, height, 3, pixmap.data(), 100);
 }
 
 int main() {
